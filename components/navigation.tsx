@@ -56,7 +56,7 @@ function UserAccountDropdown() {
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder-avatar.jpg" alt={user?.name || "User"} />
             <AvatarFallback>
-              {user ? user.initials : "JD"}
+              {user ? user.initials : "U"}
             </AvatarFallback>
           </Avatar>
         </Button>
