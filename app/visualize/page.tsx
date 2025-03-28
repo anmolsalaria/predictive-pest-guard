@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import VisualizePage from "@/components/visualize/VisualizePage"
+import AuthCheck from "@/components/auth/AuthCheck"
 
 export const metadata: Metadata = {
   title: "Visualize | Predictive PestGuard",
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function Visualize() {
-  return <VisualizePage />
+  return (
+    <AuthCheck>
+      <VisualizePage />
+    </AuthCheck>
+  )
 }
 

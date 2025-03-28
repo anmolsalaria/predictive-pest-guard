@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Dashboard from "@/components/Dashboard"
+import AuthCheck from "@/components/auth/AuthCheck"
 
 export const metadata: Metadata = {
   title: "Dashboard | Predictive PestGuard",
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function DashboardPage() {
-  return <Dashboard />
+  return (
+    <AuthCheck>
+      <Dashboard />
+    </AuthCheck>
+  )
 }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import ReportsPage from "@/components/ReportsPage"
+import AuthCheck from "@/components/auth/AuthCheck"
 
 export const metadata: Metadata = {
   title: "Reports | Predictive PestGuard",
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function Reports() {
-  return <ReportsPage />
+  return (
+    <AuthCheck>
+      <ReportsPage />
+    </AuthCheck>
+  )
 }
 

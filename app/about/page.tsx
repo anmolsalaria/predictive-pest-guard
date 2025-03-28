@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FaChartLine, FaRobot, FaCloudSunRain } from "react-icons/fa"
+import { FaChartLine, FaRobot, FaCloudSunRain, FaGithub, FaLinkedin } from "react-icons/fa"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -82,11 +82,11 @@ export default function AboutPage() {
             </a>
           </p>
           <div className="flex space-x-4">
-            <Button asChild>
-              <Link href="https://github.com/Kushagra-Gupta-755/Predictive-PestGuard">GitHub</Link>
+            <Button asChild className="flex items-center gap-2">
+              <Link href="https://github.com/Kushagra-Gupta-755/Predictive-PestGuard"><FaGithub className="text-xl" /> GitHub</Link>
             </Button>
-            <Button asChild>
-              <Link href="https://www.linkedin.com/in/kushagra-gupta-a1b6b4291/">LinkedIn</Link>
+            <Button asChild className="flex items-center gap-2">
+              <Link href="https://www.linkedin.com/in/kushagra-gupta-a1b6b4291/"><FaLinkedin className="text-xl" /> LinkedIn</Link>
             </Button>
           </div>
         </div>
