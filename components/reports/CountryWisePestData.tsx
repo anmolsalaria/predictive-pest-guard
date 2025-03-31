@@ -6,6 +6,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Bar, Line } from "react-chartjs-2"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js"
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend)
 
 // Mock data (replace with actual API calls later)
 const mockPestData = [
@@ -102,7 +117,29 @@ export default function CountryWisePestData() {
             <CardTitle>Pest-Affected Regions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] bg-gray-100 flex items-center justify-center">Map Placeholder</div>
+            <div className="h-[300px] relative">
+              <Bar
+                data={{
+                  labels: ["Region 1", "Region 2", "Region 3", "Region 4", "Region 5"],
+                  datasets: [
+                    {
+                      label: "Affected Areas",
+                      data: [12, 19, 3, 5, 2],
+                      backgroundColor: "rgba(75, 192, 192, 0.6)",
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: "top" as const,
+                    },
+                  },
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -110,7 +147,30 @@ export default function CountryWisePestData() {
             <CardTitle>Outbreak Trends Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] bg-gray-100 flex items-center justify-center">Chart Placeholder</div>
+            <div className="h-[300px] relative">
+              <Line
+                data={{
+                  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                  datasets: [
+                    {
+                      label: "Outbreaks",
+                      data: [12, 19, 3, 5, 2, 3],
+                      borderColor: "rgb(255, 99, 132)",
+                      backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: "top" as const,
+                    },
+                  },
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
       </div>

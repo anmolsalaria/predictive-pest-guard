@@ -62,7 +62,7 @@ export default function AboutPage() {
             expertise in machine learning, agriculture, and software development, we strive to create innovative,
             data-driven solutions for sustainable farming.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <h3 className="text-xl font-semibold">Kushagra Gupta</h3>
             </div>
@@ -71,6 +71,9 @@ export default function AboutPage() {
             </div>
             <div className="text-center">
               <h3 className="text-xl font-semibold">Mehul Bansal</h3>
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-semibold">Dev Thukral</h3>
             </div>
           </div>
 

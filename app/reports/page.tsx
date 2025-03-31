@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
-import ReportsPage from "@/components/ReportsPage"
+import EnhancedPestReportsPage from "@/components/reports/EnhancedPestReportsPage"
 import AuthCheck from "@/components/auth/AuthCheck"
 
 export const metadata: Metadata = {
-  title: "Reports | Predictive PestGuard",
-  description: "Comprehensive pest and plant disease data with interactive visualizations and detailed insights.",
+  title: "Pest Outbreak Reports | Predictive PestGuard",
+  description:
+    "Comprehensive data on agricultural pests affecting crops in India, USA, and China, including scientific information, affected crops, and prevention methods.",
 }
 
 export default function Reports() {
   return (
     <AuthCheck>
-      <ReportsPage />
+      <EnhancedPestReportsPage />
     </AuthCheck>
   )
 }
