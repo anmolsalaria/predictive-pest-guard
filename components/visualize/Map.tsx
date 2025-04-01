@@ -2,9 +2,10 @@
 import L from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import { useEffect, useState } from "react"
 
 // Fix for default marker icon in Leaflet with Next.js
-delete L.Icon.Default.prototype._getIconUrl
+delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -26,6 +27,15 @@ interface MapProps {
 }
 
 export default function Map({ locations }: MapProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
   // Create custom markers based on severity
   const createCustomMarker = (severity: string, cases = 0) => {
     let markerColor = ""
@@ -75,6 +85,10 @@ export default function Map({ locations }: MapProps) {
     }
   }
 
+  if (!isMounted) {
+    return <div className="h-[500px] w-full bg-gray-100" />
+  }
+
   return (
     <MapContainer
       center={[20, 0]} // Center at a point that shows most of the world
@@ -95,7 +109,7 @@ export default function Map({ locations }: MapProps) {
       />
       {locations.map((location, index) => (
         <Marker
-          key={index}
+          key={`${location.country}-${location.region}-${index}`}
           position={[location.lat, location.lng]}
           icon={createCustomMarker(location.severity, location.cases)}
         >

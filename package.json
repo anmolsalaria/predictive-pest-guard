@@ -57,6 +57,7 @@
     "react-day-picker": "latest",
     "react-dom": "^18",
     "react-hook-form": "^7.54.1",
+    "react-hot-toast": "^2.5.2",
     "react-icons": "latest",
     "react-leaflet": "^4.2.1",
     "react-plotly.js": "latest",

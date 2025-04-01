@@ -21,9 +21,34 @@ import {
 } from "@/components/ui/pagination"
 import { Search, Download, ExternalLink, FileText, MessageSquare } from "lucide-react"
 import Image from "next/image"
+import { useLanguage } from "@/lib/LanguageContext"
+import { useTranslations } from "@/lib/translations"
+
+interface Pest {
+  id: string;
+  country: string;
+  state: string;
+  pestName: string;
+  scientificName: string;
+  affectedCrops: string;
+  occurrencePeriod: string;
+  severityLevel: string;
+  description: string;
+  signsSymptoms: string;
+  preventiveMeasures: string;
+  lifeCycle: string;
+  economicImpact: string;
+  geographicalSpread: string;
+  imageUrl: string;
+  affectedCropImages: string[];
+  researchLinks: Array<{
+    name: string;
+    url: string;
+  }>;
+}
 
 // Pest data for the table
-const pestData = [
+const pestData: Pest[] = [
   // India
   {
     id: "in-pb-01",
@@ -269,6 +294,8 @@ const pestData = [
       "Adults are small mosquito-like flies that lay eggs on rice shoots. Larvae enter the growing point and induce gall formation. The complete life cycle takes 25-30 days.",
     economicImpact:
       "Causes yield losses of 10-70% in affected fields. Annual economic damage estimated at $200-300 million across rice-growing regions in Asia.",
+    geographicalSpread:
+      "Found in major tea-growing regions of China, India, Sri Lanka, and other parts of Southeast Asia. Different species of loopers affect tea in different geographical regions.",
     imageUrl: "/images/pests/rice-gall-midge.png",
     affectedCropImages: [],
     researchLinks: [
@@ -420,11 +447,13 @@ const researchSources = [
 ]
 
 export default function EnhancedPestReportsPage() {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("all")
   const [selectedSeverity, setSelectedSeverity] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedPest, setSelectedPest] = useState(null)
+  const [selectedPest, setSelectedPest] = useState<Pest | null>(null)
   const itemsPerPage = 5
 
   // Filter data based on search query and selected filters
@@ -448,13 +477,13 @@ export default function EnhancedPestReportsPage() {
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   // Handle search
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
     setCurrentPage(1) // Reset to first page on new search
   }
 
   // Get severity badge color
-  const getSeverityColor = (severity) => {
+  const getSeverityColor = (severity: string): string => {
     switch (severity) {
       case "Low":
         return "bg-green-500"
@@ -477,11 +506,9 @@ export default function EnhancedPestReportsPage() {
   return (
     <div className="min-h-screen bg-[#F8DEB9]">
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold mb-4">Pest Outbreak Reports</h1>
+        <h1 className="text-4xl font-bold mb-4">{t.reports.title}</h1>
         <p className="text-lg mb-8">
-          Monitoring and understanding pest outbreaks is crucial for sustainable agriculture. This database provides
-          comprehensive information on agricultural pests affecting crops in India, the USA, and China, helping farmers
-          and researchers implement effective pest management strategies and minimize crop losses.
+          {t.reports.description}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -489,16 +516,16 @@ export default function EnhancedPestReportsPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center">
                 <FileText className="h-5 w-5 mr-2" />
-                Download Reports
+                {t.reports.downloadReports.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Generate and download detailed PDF reports of pest data for your region
+                {t.reports.downloadReports.description}
               </p>
               <Button onClick={handleExportPDF} className="w-full">
                 <Download className="mr-2 h-4 w-4" />
-                Export as PDF
+                {t.reports.downloadReports.button}
               </Button>
             </CardContent>
           </Card>
@@ -507,16 +534,16 @@ export default function EnhancedPestReportsPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center">
                 <MessageSquare className="h-5 w-5 mr-2" />
-                Ask an Expert
+                {t.reports.askExpert.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Have questions about pest management? Connect with agricultural experts
+                {t.reports.askExpert.description}
               </p>
               <Button className="w-full">
                 <MessageSquare className="mr-2 h-4 w-4" />
-                Start Chat
+                {t.reports.askExpert.button}
               </Button>
             </CardContent>
           </Card>
@@ -524,9 +551,9 @@ export default function EnhancedPestReportsPage() {
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Search and Filter</CardTitle>
+            <CardTitle>{t.reports.searchAndFilter.title}</CardTitle>
             <CardDescription>
-              Find specific pest information by country, severity level, or keyword search
+              {t.reports.searchAndFilter.description}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -536,7 +563,7 @@ export default function EnhancedPestReportsPage() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search by pest name, crop, or region..."
+                    placeholder={t.reports.searchAndFilter.searchPlaceholder}
                     className="pl-8"
                     value={searchQuery}
                     onChange={handleSearch}
@@ -545,24 +572,24 @@ export default function EnhancedPestReportsPage() {
               </div>
               <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select country" />
+                  <SelectValue placeholder={t.reports.searchAndFilter.countrySelect.placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  <SelectItem value="India">India</SelectItem>
-                  <SelectItem value="USA">USA</SelectItem>
-                  <SelectItem value="China">China</SelectItem>
+                  <SelectItem value="all">{t.reports.searchAndFilter.countrySelect.allCountries}</SelectItem>
+                  <SelectItem value="India">{t.reports.searchAndFilter.countrySelect.india}</SelectItem>
+                  <SelectItem value="USA">{t.reports.searchAndFilter.countrySelect.usa}</SelectItem>
+                  <SelectItem value="China">{t.reports.searchAndFilter.countrySelect.china}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select severity" />
+                  <SelectValue placeholder={t.reports.searchAndFilter.severitySelect.placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Severity Levels</SelectItem>
-                  <SelectItem value="Low">Low</SelectItem>
-                  <SelectItem value="Moderate">Moderate</SelectItem>
-                  <SelectItem value="High">High</SelectItem>
+                  <SelectItem value="all">{t.reports.searchAndFilter.severitySelect.allSeverity}</SelectItem>
+                  <SelectItem value="Low">{t.reports.searchAndFilter.severitySelect.low}</SelectItem>
+                  <SelectItem value="Moderate">{t.reports.searchAndFilter.severitySelect.moderate}</SelectItem>
+                  <SelectItem value="High">{t.reports.searchAndFilter.severitySelect.high}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -571,9 +598,9 @@ export default function EnhancedPestReportsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Pest Data Table</CardTitle>
+            <CardTitle>{t.reports.pestDataTable.title}</CardTitle>
             <CardDescription>
-              Showing {paginatedData.length} of {filteredData.length} entries
+              {t.reports.pestDataTable.description.replace(/{count}/g, paginatedData.length.toString()).replace(/{total}/g, filteredData.length.toString())}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -582,13 +609,13 @@ export default function EnhancedPestReportsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Country</TableHead>
-                      <TableHead>State/Province</TableHead>
-                      <TableHead>Pest Name</TableHead>
-                      <TableHead>Affected Crops</TableHead>
-                      <TableHead>Occurrence Period</TableHead>
-                      <TableHead>Severity</TableHead>
-                      <TableHead>View Details</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.country}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.state}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.pestName}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.affectedCrops}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.occurrencePeriod}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.severity}</TableHead>
+                      <TableHead>{t.reports.pestDataTable.columns.viewDetails}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -612,7 +639,7 @@ export default function EnhancedPestReportsPage() {
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                  View More Details
+                                  {t.reports.pestDataTable.viewMore}
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -636,65 +663,62 @@ export default function EnhancedPestReportsPage() {
                                       {pest.pestName} - {pest.scientificName}
                                     </p>
                                     <p className="text-sm mt-4 text-muted-foreground">
-                                      <strong>Affected Crops:</strong> {pest.affectedCrops}
+                                      <strong>{t.reports.pestDataTable.columns.affectedCrops}:</strong> {pest.affectedCrops}
                                     </p>
                                   </div>
 
                                   <div>
                                     <Tabs defaultValue="overview">
                                       <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                                        <TabsTrigger value="lifecycle">Lifecycle</TabsTrigger>
-                                        <TabsTrigger value="management">Management</TabsTrigger>
+                                        <TabsTrigger value="overview">{t.reports.pestDataTable.tabs.overview}</TabsTrigger>
+                                        <TabsTrigger value="lifecycle">{t.reports.pestDataTable.tabs.lifecycle}</TabsTrigger>
+                                        <TabsTrigger value="management">{t.reports.pestDataTable.tabs.management}</TabsTrigger>
                                       </TabsList>
 
                                       <TabsContent value="overview" className="space-y-4">
                                         <div>
-                                          <h3 className="font-semibold">Description</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.description}</h3>
                                           <p>{pest.description}</p>
                                         </div>
                                         <div>
-                                          <h3 className="font-semibold">Signs & Symptoms</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.signsSymptoms}</h3>
                                           <p>{pest.signsSymptoms}</p>
                                         </div>
                                         <div>
-                                          <h3 className="font-semibold">Economic Impact</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.economicImpact}</h3>
                                           <p>{pest.economicImpact}</p>
                                         </div>
                                         <div>
-                                          <h3 className="font-semibold">Geographical Spread</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.geographicalSpread}</h3>
                                           <p>{pest.geographicalSpread}</p>
                                         </div>
                                       </TabsContent>
 
                                       <TabsContent value="lifecycle">
                                         <div>
-                                          <h3 className="font-semibold">Life Cycle</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.lifecycle}</h3>
                                           <p>{pest.lifeCycle}</p>
-                                        </div>
-                                        <div className="mt-4">
-                                          <h3 className="font-semibold">Occurrence Period</h3>
-                                          <p>{pest.occurrencePeriod}</p>
                                         </div>
                                       </TabsContent>
 
                                       <TabsContent value="management">
                                         <div>
-                                          <h3 className="font-semibold">Preventive Measures</h3>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.preventiveMeasures}</h3>
                                           <p>{pest.preventiveMeasures}</p>
                                         </div>
                                         <div className="mt-4">
-                                          <h3 className="font-semibold">Research Resources</h3>
-                                          <ul className="list-disc pl-5 space-y-1 mt-2">
-                                            {pest.researchLinks.map((link, idx) => (
-                                              <li key={idx}>
+                                          <h3 className="font-semibold">{t.reports.pestDataTable.sections.researchLinks}</h3>
+                                          <ul className="list-disc pl-5">
+                                            {pest.researchLinks.map((link, index) => (
+                                              <li key={index}>
                                                 <a
                                                   href={link.url}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="text-blue-600 hover:underline"
+                                                  className="text-blue-600 hover:underline flex items-center"
                                                 >
                                                   {link.name}
+                                                  <ExternalLink className="h-4 w-4 ml-1" />
                                                 </a>
                                               </li>
                                             ))}
@@ -711,8 +735,8 @@ export default function EnhancedPestReportsPage() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-4">
-                          No results found. Try adjusting your search or filters.
+                        <TableCell colSpan={7} className="text-center">
+                          {t.common.noResults}
                         </TableCell>
                       </TableRow>
                     )}
