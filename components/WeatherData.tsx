@@ -4,8 +4,8 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Thermometer, Droplets, Wind, CloudRain } from "lucide-react"
 
-const API_KEY = "ffc322db90c023e830389eace379678e"
-const API_BASE_URL = "https://api.weatherstack.com/current"
+const API_KEY = "3582d2a39f0d4828bc5234838253103"
+const API_BASE_URL = "https://api.weatherapi.com/v1"
 
 interface WeatherData {
   temperature: number
@@ -14,7 +14,12 @@ interface WeatherData {
   precip: number
 }
 
-export default function WeatherData() {
+interface WeatherDataProps {
+  location?: string
+  onDataUpdate?: (data: WeatherData | null) => void
+}
+
+export default function WeatherData({ location = "New Delhi", onDataUpdate }: WeatherDataProps) {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,33 +33,43 @@ export default function WeatherData() {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}?access_key=${API_KEY}&query=New Delhi&units=m`)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        console.log("Fetching weather data for:", location)
+        const response = await fetch(
+          `${API_BASE_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(location)}&aqi=no`
+        )
         const data = await response.json()
-        if (!data.current || Object.keys(data.current).length === 0) {
+        console.log("Weather API response:", data)
+
+        if (data.error) {
+          throw new Error(data.error.message || "API Error")
+        }
+
+        if (!data.current) {
           throw new Error("Weather data is empty or invalid")
         }
-        if (data.error) {
-          throw new Error(data.error.info || "Unknown API error")
-        }
-        setWeatherData({
-          temperature: data.current.temperature,
+
+        const newWeatherData = {
+          temperature: data.current.temp_c,
           humidity: data.current.humidity,
-          wind_speed: data.current.wind_speed,
-          precip: data.current.precip,
-        })
+          wind_speed: data.current.wind_kph / 3.6, // Convert km/h to m/s
+          precip: data.current.precip_mm || 0,
+        }
+
+        console.log("Processed weather data:", newWeatherData)
+        setWeatherData(newWeatherData)
+        onDataUpdate?.(newWeatherData)
       } catch (err) {
         console.error("Error fetching weather data:", err)
-        setError(`Error fetching weather data: ${err instanceof Error ? err.message : "Unknown error occurred"}`)
+        const errorMessage = err instanceof Error ? err.message : "Unknown error occurred"
+        setError(`Error fetching weather data: ${errorMessage}`)
+        onDataUpdate?.(null)
       } finally {
         setLoading(false)
       }
     }
 
     fetchWeatherData()
-  }, [])
+  }, [location, onDataUpdate])
 
   if (loading) return <div>Loading weather data...</div>
   if (error) return <div className="text-red-500 p-4 bg-red-100 rounded-md">{error}</div>
@@ -86,7 +101,7 @@ export default function WeatherData() {
           <Wind className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{weatherData.wind_speed} m/s</div>
+          <div className="text-2xl font-bold">{weatherData.wind_speed.toFixed(1)} m/s</div>
         </CardContent>
       </Card>
       <Card>

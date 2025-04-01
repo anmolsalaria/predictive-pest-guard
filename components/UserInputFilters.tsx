@@ -2,11 +2,55 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-export default function UserInputFilters({ filters, setFilters }) {
-  const handleFilterChange = (key, value) => {
+interface Filters {
+  location: string
+  dateRange: string
+  pestType: string
+  search?: string
+  area: number
+}
+
+interface UserInputFiltersProps {
+  filters: Filters
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>
+}
+
+export default function UserInputFilters({ filters, setFilters }: UserInputFiltersProps) {
+  const handleFilterChange = (key: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
+
+  const locationOptions = [
+    // Indian Cities
+    "New Delhi",
+    "Mumbai",
+    "Bangalore",
+    "Chennai",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+    "Ahmedabad",
+    // USA Cities
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Houston",
+    "Phoenix",
+    "Philadelphia",
+    "San Antonio",
+    "San Diego",
+    // China Cities
+    "Beijing",
+    "Shanghai",
+    "Guangzhou",
+    "Shenzhen",
+    "Chengdu",
+    "Xi'an",
+    "Chongqing",
+    "Hangzhou"
+  ]
 
   return (
     <div className="flex flex-wrap gap-4 mb-6">
@@ -15,9 +59,11 @@ export default function UserInputFilters({ filters, setFilters }) {
           <SelectValue placeholder="Select location" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="location1">Location 1</SelectItem>
-          <SelectItem value="location2">Location 2</SelectItem>
-          <SelectItem value="location3">Location 3</SelectItem>
+          {locationOptions.map((location) => (
+            <SelectItem key={location} value={location}>
+              {location}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -37,18 +83,40 @@ export default function UserInputFilters({ filters, setFilters }) {
           <SelectValue placeholder="Select pest type" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="pest1">Pest Type 1</SelectItem>
-          <SelectItem value="pest2">Pest Type 2</SelectItem>
-          <SelectItem value="pest3">Pest Type 3</SelectItem>
+          <SelectItem value="aphids">Aphids</SelectItem>
+          <SelectItem value="locusts">Locusts</SelectItem>
+          <SelectItem value="whiteflies">Whiteflies</SelectItem>
+          <SelectItem value="fall_armyworm">Fall Armyworm</SelectItem>
+          <SelectItem value="rice_blast">Rice Blast</SelectItem>
         </SelectContent>
       </Select>
 
-      <Input
-        type="text"
-        placeholder="Search outbreaks..."
-        className="w-[200px]"
-        onChange={(e) => handleFilterChange("search", e.target.value)}
-      />
+      <div className="flex-1">
+        <Label htmlFor="search">Search Outbreaks</Label>
+        <Input
+          id="search"
+          placeholder="Search by outbreak type, severity, or region..."
+          value={filters.search || ""}
+          onChange={(e) => handleFilterChange("search", e.target.value)}
+          className="w-full"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Search for: outbreak types (e.g., "Aphids", "Locusts"), severity levels (e.g., "High", "Medium"), or regions (e.g., "North", "South")
+        </p>
+      </div>
+
+      <div className="w-[180px]">
+        <Label htmlFor="area">Farm Area (acres)</Label>
+        <Input
+          id="area"
+          type="number"
+          min="1"
+          placeholder="Enter area"
+          value={filters.area || ""}
+          onChange={(e) => handleFilterChange("area", e.target.value)}
+          className="w-full"
+        />
+      </div>
     </div>
   )
 }
