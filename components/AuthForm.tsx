@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useAuth } from '@/lib/auth';
-import { useLanguage } from '@/lib/LanguageContext';
+import { useLanguage } from '@/lib/context/LanguageContext';
 import { useTranslations } from '@/lib/translations';
 import { toast } from 'react-hot-toast';
 
@@ -40,21 +40,57 @@ export default function AuthForm() {
     try {
       if (isLogin) {
         const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-        setUser(result.user);
-        toast.success(t.success.loginSuccess);
-        router.push('/dashboard');
+        if (result.user) {
+          setUser(result.user);
+          toast.success(t.auth.loginSuccess, {
+            duration: 3000,
+            position: 'top-center',
+            style: {
+              background: '#4CAF50',
+              color: '#fff',
+            },
+          });
+          router.push('/dashboard');
+        }
       } else {
         if (formData.password !== formData.confirmPassword) {
-          toast.error(t.auth.passwordsDontMatch);
+          toast.error(t.auth.passwordsDontMatch, {
+            duration: 3000,
+            position: 'top-center',
+            style: {
+              background: '#f44336',
+              color: '#fff',
+            },
+          });
           return;
         }
         const result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        setUser(result.user);
-        toast.success(t.success.signupSuccess);
-        router.push('/dashboard');
+        if (result.user) {
+          if (formData.name) {
+            await updateProfile(result.user, { displayName: formData.name });
+          }
+          setUser(result.user);
+          toast.success(t.auth.signupSuccess, {
+            duration: 3000,
+            position: 'top-center',
+            style: {
+              background: '#4CAF50',
+              color: '#fff',
+            },
+          });
+          router.push('/dashboard');
+        }
       }
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('Auth error:', error);
+      toast.error(error.message || t.auth.authError, {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#f44336',
+          color: '#fff',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -65,11 +101,28 @@ export default function AuthForm() {
     setError("");
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      setUser(result.user);
-      toast.success(t.auth.googleSignInSuccess);
-      router.push('/dashboard');
+      if (result.user) {
+        setUser(result.user);
+        toast.success(t.auth.googleSignInSuccess, {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            background: '#4CAF50',
+            color: '#fff',
+          },
+        });
+        router.push('/dashboard');
+      }
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('Google auth error:', error);
+      toast.error(error.message || t.auth.googleAuthError, {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#f44336',
+          color: '#fff',
+        },
+      });
     } finally {
       setLoading(false);
     }
