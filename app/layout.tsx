@@ -1,27 +1,35 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { Toaster } from "react-hot-toast"
+import { AuthProvider } from "@/lib/auth"
+import { LanguageProvider } from "@/lib/context/LanguageContext"
 import { Navigation } from "@/components/navigation"
-import type React from "react" // Import React
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Predictive PestGuard",
-  description: "Protect crop yield and increase farm profitability through science-based pest tracking",
-  generator: "v0.dev",
+  description: "AI-powered pest outbreak prediction and management system",
 }
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navigation />
-        {children}
+        <AuthProvider>
+          <LanguageProvider>
+            <Navigation />
+            <main className="min-h-screen bg-background">
+              {children}
+            </main>
+            <Toaster position="top-right" />
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   )
@@ -44,7 +52,5 @@ import "./globals.css"
 import "./globals.css"
 
 import "./globals.css"
-
-
 
 import './globals.css'
