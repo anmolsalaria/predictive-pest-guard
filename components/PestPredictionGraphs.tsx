@@ -16,7 +16,7 @@ interface WeatherData {
 interface GraphData {
   trendData: any[]
   riskZones: any
-  pestActivityTimeline: any[]
+  cropImpact: any[]
 }
 
 interface PestPredictionGraphsProps {
@@ -30,32 +30,6 @@ interface PestPredictionGraphsProps {
 
 export default function PestPredictionGraphs({ filters, weatherData }: PestPredictionGraphsProps) {
   const [data, setData] = useState<GraphData | null>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!weatherData) {
-        setData(null)
-        return
-      }
-
-      try {
-        // Generate prediction data based on weather conditions
-        const trendData = generateTrendData(weatherData)
-        const riskZones = generateRiskZones(weatherData)
-        const pestActivityTimeline = generatePestActivityTimeline(weatherData)
-
-        setData({
-          trendData,
-          riskZones,
-          pestActivityTimeline,
-        })
-      } catch (err) {
-        console.error("Error generating prediction data:", err)
-      }
-    }
-
-    fetchData()
-  }, [filters, weatherData])
 
   const generateTrendData = (weather: WeatherData) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
@@ -117,46 +91,68 @@ export default function PestPredictionGraphs({ filters, weatherData }: PestPredi
     }
   }
 
-  const generatePestActivityTimeline = (weather: WeatherData) => {
-    // Generate hourly data points for a 24-hour period
-    const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`)
-    
-    // Calculate base activity level from current weather
-    const baseActivity = (weather.temperature * 0.4 + weather.humidity * 0.3 + weather.precip * 0.3) / 100
-    
-    // Generate activity levels for each hour
-    const activityLevels = hours.map((_, index) => {
-      // Add time-of-day variations
-      let timeMultiplier = 1
-      if (index >= 6 && index <= 10) timeMultiplier = 1.2  // Morning peak
-      if (index >= 16 && index <= 20) timeMultiplier = 1.3 // Evening peak
-      if (index >= 22 || index <= 4) timeMultiplier = 0.7  // Night low
-      
-      // Add some random variation
-      const randomFactor = 0.9 + Math.random() * 0.2
-      
-      return Math.round(baseActivity * timeMultiplier * randomFactor)
+  const generateCropImpactData = (weather: WeatherData) => {
+    // Define common crops and their vulnerability to weather conditions
+    const crops = [
+      { name: "Rice", temp: 28, humidity: 80, precip: 15, wind: 5 },
+      { name: "Wheat", temp: 25, humidity: 60, precip: 8, wind: 10 },
+      { name: "Cotton", temp: 30, humidity: 65, precip: 5, wind: 8 },
+      { name: "Sugarcane", temp: 27, humidity: 75, precip: 12, wind: 6 },
+      { name: "Maize", temp: 26, humidity: 70, precip: 10, wind: 7 }
+    ]
+
+    // Calculate vulnerability scores based on weather conditions
+    const vulnerabilityScores = crops.map(crop => {
+      // Calculate similarity score between current weather and crop's preferred conditions
+      const tempScore = 100 - Math.abs(weather.temperature - crop.temp) * 2
+      const humidityScore = 100 - Math.abs(weather.humidity - crop.humidity)
+      const precipScore = 100 - Math.abs(weather.precip - crop.precip) * 3
+      const windScore = 100 - Math.abs(weather.wind_speed - crop.wind) * 4
+
+      // Calculate overall vulnerability score
+      const vulnerability = Math.round((tempScore * 0.3 + humidityScore * 0.3 + precipScore * 0.2 + windScore * 0.2) * (0.8 + Math.random() * 0.4))
+      return Math.min(100, Math.max(0, vulnerability))
     })
 
     return [
       {
-        x: hours,
-        y: activityLevels,
-        type: "scatter",
-        mode: "lines+markers",
-        line: {
-          color: '#3b82f6',
-          width: 2
-        },
+        x: crops.map(crop => crop.name),
+        y: vulnerabilityScores,
+        type: "bar",
         marker: {
-          color: activityLevels.map(level => 
-            level > 70 ? '#ef4444' : level > 40 ? '#f59e0b' : '#22c55e'
-          ),
-          size: 8
+          color: vulnerabilityScores.map(score => 
+            score > 70 ? '#ef4444' : score > 40 ? '#f59e0b' : '#22c55e'
+          )
         }
       }
     ]
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!weatherData) {
+        setData(null)
+        return
+      }
+
+      try {
+        // Generate prediction data based on weather conditions
+        const trendData = generateTrendData(weatherData)
+        const riskZones = generateRiskZones(weatherData)
+        const cropImpact = generateCropImpactData(weatherData)
+
+        setData({
+          trendData,
+          riskZones,
+          cropImpact,
+        })
+      } catch (err) {
+        console.error("Error generating prediction data:", err)
+      }
+    }
+
+    fetchData()
+  }, [filters, weatherData])
 
   if (!data) return <div>Loading prediction data...</div>
 
@@ -225,24 +221,25 @@ export default function PestPredictionGraphs({ filters, weatherData }: PestPredi
           </div>
 
           <div className="w-full">
-            <h3 className="text-sm font-medium mb-1">Pest Activity Timeline</h3>
+            <h3 className="text-sm font-medium mb-1">Weather Impact on Crops</h3>
             <div className="h-[180px] w-full">
               <Plot
-                data={data.pestActivityTimeline}
+                data={data.cropImpact}
                 layout={{
                   height: 180,
                   width: undefined,
                   autosize: true,
-                  margin: { t: 10, b: 30, l: 40, r: 10 },
+                  margin: { t: 10, b: 40, l: 40, r: 10 },
                   showlegend: false,
                   font: { size: 12 },
                   yaxis: {
-                    title: 'Expected Pest Activity (%)',
+                    title: 'Crop Vulnerability (%)',
                     range: [0, 100]
                   },
                   xaxis: {
-                    title: 'Time of Day',
-                    tickangle: -45
+                    title: 'Crop Type',
+                    tickangle: 0,
+                    automargin: true
                   }
                 }}
                 useResizeHandler={true}
@@ -250,20 +247,20 @@ export default function PestPredictionGraphs({ filters, weatherData }: PestPredi
               />
             </div>
             <div className="mt-2 text-xs text-gray-500">
-              <p className="mb-1">Expected pest activity throughout the day:</p>
+              <p className="mb-1">Current weather impact on different crops:</p>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded"></div>
-                <span>High Activity ({'>'}70%) - Best time for pest control</span>
+                <span>High Vulnerability ({'>'}70%) - Immediate protection needed</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                <span>Medium Activity (40-70%) - Monitor and prepare</span>
+                <span>Medium Vulnerability (40-70%) - Monitor and prepare</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded"></div>
-                <span>Low Activity ({'<'}40%) - Regular monitoring</span>
+                <span>Low Vulnerability ({'<'}40%) - Regular monitoring</span>
               </div>
-              <p className="mt-1 text-xs italic">Peak activity typically occurs during morning (6-10 AM) and evening (4-8 PM) hours.</p>
+              <p className="mt-1 text-xs italic">Vulnerability is calculated based on how current weather conditions differ from each crop's optimal growing conditions.</p>
             </div>
           </div>
         </div>
