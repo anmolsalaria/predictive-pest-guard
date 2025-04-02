@@ -12,6 +12,25 @@ export function AboutPageContent() {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
+  const teamMembers = [
+    {
+      name: "Kushagra Gupta",
+      linkedin: "https://www.linkedin.com/in/kushagra-gupta-a1b6b4291?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+    },
+    {
+      name: "Anmol Salaria",
+      linkedin: "https://www.linkedin.com/in/anmol-salaria-b2164028a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+    },
+    {
+      name: "Mehul Bansal",
+      linkedin: "https://www.linkedin.com/in/mehul-bansall?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+    },
+    {
+      name: "Dev Thukral",
+      linkedin: "https://www.linkedin.com/in/dev-thukral-a57564349?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+    }
+  ];
+
   return (
     <main className="flex min-h-screen flex-col relative">
       <Image
@@ -68,9 +87,17 @@ export function AboutPageContent() {
             {t.about.team.description}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {t.about.team.members.map((member, index) => (
+            {teamMembers.map((member, index) => (
               <div key={index} className="text-center">
-                <h3 className="text-xl font-semibold">{member}</h3>
+                <Link 
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 hover:text-blue-400 transition-colors whitespace-nowrap"
+                >
+                  <h3 className="text-xl font-semibold truncate">{member.name}</h3>
+                  <FaLinkedin className="text-xl flex-shrink-0" />
+                </Link>
               </div>
             ))}
           </div>
