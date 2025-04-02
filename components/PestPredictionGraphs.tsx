@@ -32,41 +32,58 @@ export default function PestPredictionGraphs({ filters, weatherData }: PestPredi
   const [data, setData] = useState<GraphData | null>(null)
 
   const generateTrendData = (weather: WeatherData) => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
-    const historicalValues = months.map(() => {
-      // Generate historical values based on current weather
-      const baseTemp = weather.temperature
-      const baseHumidity = weather.humidity
-      return Math.round(
-        (baseTemp * 0.7 + baseHumidity * 0.3) * (0.8 + Math.random() * 0.4)
-      )
-    })
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    
+    // Define historical data for each pest type
+    const pestData = {
+      locusts: {
+        historical: [80, 90, 120, 150, 180, 200, 230, 210, 180, 150, 120, 90],
+        predicted: [85, 95, 125, 155, 185, 205, 235, 215, 185, 155, 125, 95],
+        color: 'rgb(255, 99, 132)'
+      },
+      aphids: {
+        historical: [40, 45, 60, 75, 90, 110, 100, 85, 70, 55, 45, 40],
+        predicted: [42, 48, 63, 78, 93, 115, 105, 88, 73, 58, 47, 42],
+        color: 'rgb(54, 162, 235)'
+      },
+      borers: {
+        historical: [60, 70, 90, 110, 140, 160, 170, 150, 130, 110, 90, 70],
+        predicted: [63, 73, 93, 115, 145, 165, 175, 155, 135, 115, 93, 73],
+        color: 'rgb(255, 205, 86)'
+      },
+      fungal: {
+        historical: [50, 60, 80, 100, 130, 150, 140, 120, 100, 80, 60, 50],
+        predicted: [52, 63, 83, 105, 135, 155, 145, 125, 105, 83, 63, 52],
+        color: 'rgb(75, 192, 192)'
+      },
+      whiteflies: {
+        historical: [30, 35, 45, 60, 75, 80, 75, 65, 55, 45, 35, 30],
+        predicted: [32, 37, 47, 63, 78, 83, 78, 68, 58, 47, 37, 32],
+        color: 'rgb(153, 102, 255)'
+      }
+    }
 
-    const predictedValues = months.map(() => {
-      // Generate predicted values based on current weather
-      const baseTemp = weather.temperature
-      const baseHumidity = weather.humidity
-      return Math.round(
-        (baseTemp * 0.7 + baseHumidity * 0.3) * (1.2 + Math.random() * 0.3)
-      )
-    })
-
-    return [
+    // Generate data for each pest type
+    const trendData = Object.entries(pestData).map(([pest, data]) => [
       {
         x: months,
-        y: historicalValues,
+        y: data.historical,
         type: "scatter",
         mode: "lines+markers",
-        name: "Historical",
+        name: `${pest.charAt(0).toUpperCase() + pest.slice(1)} Historical`,
+        line: { color: data.color }
       },
       {
         x: months,
-        y: predictedValues,
+        y: data.predicted,
         type: "scatter",
         mode: "lines+markers",
-        name: "Predicted",
-      },
-    ]
+        name: `${pest.charAt(0).toUpperCase() + pest.slice(1)} Predicted`,
+        line: { color: data.color, dash: 'dash' }
+      }
+    ]).flat()
+
+    return trendData
   }
 
   const generateRiskZones = (weather: WeatherData) => {
@@ -165,17 +182,24 @@ export default function PestPredictionGraphs({ filters, weatherData }: PestPredi
         <div className="space-y-2">
           <div className="w-full">
             <h3 className="text-sm font-medium mb-1">Historical and Predicted Trends</h3>
-            <div className="h-[200px] w-full">
+            <div className="h-[400px] w-full">
               <Plot
                 data={data.trendData}
                 layout={{
-                  height: 200,
+                  height: 400,
                   width: undefined,
                   autosize: true,
                   margin: { t: 10, b: 30, l: 40, r: 10 },
                   showlegend: true,
                   legend: { orientation: "h", y: -0.2, x: 0.5 },
-                  font: { size: 12 }
+                  font: { size: 12 },
+                  yaxis: {
+                    title: 'Number of Cases',
+                    range: [0, 250]
+                  },
+                  xaxis: {
+                    title: 'Month'
+                  }
                 }}
                 useResizeHandler={true}
                 style={{ width: '100%', height: '100%' }}
