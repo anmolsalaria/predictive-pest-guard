@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { UserCircle, Home, BarChart2, FileText, Info, Map } from "lucide-react";
+import { UserCircle, Home, BarChart2, FileText, Info, Map, Crown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,6 +116,10 @@ export function Navigation() {
           <Link href="/visualize" className="font-medium hover:text-primary flex items-center">
             <Map className="mr-2 h-4 w-4" />
             {t('common.visualize')}
+          </Link>
+          <Link href="/pro" className="font-medium hover:text-primary flex items-center">
+            <Crown className="mr-2 h-4 w-4" />
+            {t('Pestguard.pro')}
           </Link>
           <Link href="/about" className="font-medium hover:text-primary flex items-center">
             <Info className="mr-2 h-4 w-4" />
