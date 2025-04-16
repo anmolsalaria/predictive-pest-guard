@@ -117,9 +117,9 @@ export function Navigation() {
             <Map className="mr-2 h-4 w-4" />
             {t('common.visualize')}
           </Link>
-          <Link href="/pro" className="font-medium hover:text-primary flex items-center">
+          <Link href="/pestguard-pro" className="font-medium hover:text-primary flex items-center">
             <Crown className="mr-2 h-4 w-4" />
-            {t('Pestguard.pro')}
+            Pro
           </Link>
           <Link href="/about" className="font-medium hover:text-primary flex items-center">
             <Info className="mr-2 h-4 w-4" />
