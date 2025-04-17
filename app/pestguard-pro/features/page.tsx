@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, MessageSquare } from "lucide-react";
 import AuthCheck from "@/components/auth/AuthCheck";
 import ProFeatureGuard from "@/components/ProFeatureGuard";
+import SubscriptionManagement from "@/components/SubscriptionManagement";
 
 function ProFeaturesContent() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -62,6 +63,9 @@ function ProFeaturesContent() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Access your premium pest management tools
           </p>
+          <div className="mt-4">
+            <SubscriptionManagement />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
