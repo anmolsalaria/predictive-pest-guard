@@ -1,3 +1,6 @@
+'use client';
+
+import { Suspense } from 'react';
 import AuthForm from "@/components/AuthForm"
 import Image from "next/image"
 
@@ -14,7 +17,9 @@ export default function AuthPage() {
         />
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Predictive PestGuard</h2>
       </div>
-      <AuthForm />
+      <Suspense fallback={<div>Loading...</div>}>
+        <AuthForm />
+      </Suspense>
     </div>
   )
 }

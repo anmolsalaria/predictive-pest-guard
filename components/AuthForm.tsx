@@ -35,19 +35,23 @@ export default function AuthForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Check if user just verified their email
-    const verified = searchParams.get('verified');
-    if (verified === 'true') {
-      toast.success(t.auth.emailVerified, {
-        duration: 5000,
-        position: 'top-center',
-        style: {
-          background: '#4CAF50',
-          color: '#fff',
-        },
-      });
-      // Remove the query parameter from URL
-      router.replace('/auth');
+    try {
+      // Check if user just verified their email
+      const verified = searchParams?.get('verified');
+      if (verified === 'true') {
+        toast.success(t.auth.emailVerified, {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: '#4CAF50',
+            color: '#fff',
+          },
+        });
+        // Remove the query parameter from URL
+        router.replace('/auth');
+      }
+    } catch (error) {
+      console.error('Error handling verification status:', error);
     }
   }, [searchParams, router, t]);
 
