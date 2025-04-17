@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { auth, googleProvider } from "@/lib/firebase";
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   updateProfile,
-  signInWithPopup
+  signInWithPopup,
+  sendEmailVerification
 } from "firebase/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,24 @@ export default function AuthForm() {
   const { language } = useLanguage();
   const t = useTranslations(language);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Check if user just verified their email
+    const verified = searchParams.get('verified');
+    if (verified === 'true') {
+      toast.success(t.auth.emailVerified, {
+        duration: 5000,
+        position: 'top-center',
+        style: {
+          background: '#4CAF50',
+          color: '#fff',
+        },
+      });
+      // Remove the query parameter from URL
+      router.replace('/auth');
+    }
+  }, [searchParams, router, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +60,19 @@ export default function AuthForm() {
       if (isLogin) {
         const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
         if (result.user) {
+          if (!result.user.emailVerified) {
+            toast.error(t.auth.emailNotVerified, {
+              duration: 5000,
+              position: 'top-center',
+              style: {
+                background: '#f44336',
+                color: '#fff',
+              },
+            });
+            await sendEmailVerification(result.user);
+            router.push('/verify-email');
+            return;
+          }
           setUser(result.user);
           toast.success(t.auth.loginSuccess, {
             duration: 3000,
@@ -69,16 +101,16 @@ export default function AuthForm() {
           if (formData.name) {
             await updateProfile(result.user, { displayName: formData.name });
           }
-          setUser(result.user);
-          toast.success(t.auth.signupSuccess, {
-            duration: 3000,
+          await sendEmailVerification(result.user);
+          toast.success(t.auth.verificationEmailSent, {
+            duration: 5000,
             position: 'top-center',
             style: {
               background: '#4CAF50',
               color: '#fff',
             },
           });
-          router.push('/dashboard');
+          router.push('/verify-email');
         }
       }
     } catch (error: any) {
@@ -102,6 +134,11 @@ export default function AuthForm() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (result.user) {
+        if (!result.user.emailVerified) {
+          await sendEmailVerification(result.user);
+          router.push('/verify-email');
+          return;
+        }
         setUser(result.user);
         toast.success(t.auth.googleSignInSuccess, {
           duration: 3000,
