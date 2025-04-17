@@ -65,6 +65,8 @@ export default function AuthForm() {
         const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
         if (result.user) {
           if (!result.user.emailVerified) {
+            // Sign out the user immediately if email is not verified
+            await auth.signOut();
             toast.error(t.auth.emailNotVerified, {
               duration: 5000,
               position: 'top-center',
@@ -73,6 +75,7 @@ export default function AuthForm() {
                 color: '#fff',
               },
             });
+            // Send verification email
             await sendEmailVerification(result.user);
             router.push('/verify-email');
             return;
@@ -106,6 +109,8 @@ export default function AuthForm() {
             await updateProfile(result.user, { displayName: formData.name });
           }
           await sendEmailVerification(result.user);
+          // Sign out the user immediately after signup
+          await auth.signOut();
           toast.success(t.auth.verificationEmailSent, {
             duration: 5000,
             position: 'top-center',
@@ -139,6 +144,8 @@ export default function AuthForm() {
       const result = await signInWithPopup(auth, googleProvider);
       if (result.user) {
         if (!result.user.emailVerified) {
+          // Sign out the user immediately if email is not verified
+          await auth.signOut();
           await sendEmailVerification(result.user);
           router.push('/verify-email');
           return;
