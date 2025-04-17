@@ -63,8 +63,8 @@ function PestGuardProContent() {
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-3xl font-bold text-green-600">₹1</span>
-              <span className="text-xl text-gray-500 line-through">₹1000</span>
+              <span className="text-3xl font-bold text-green-600">₹1/month</span>
+              <span className="text-xl text-gray-500 line-through">₹1000/month</span>
             </div>
             <p className="text-sm text-gray-600">99.99% off for a limited time</p>
             <p className="text-gray-600">Cancel anytime</p>
@@ -93,7 +93,7 @@ function PestGuardProContent() {
             onClick={handleGetPro}
             className="w-full py-6 text-lg"
           >
-            Get Pro Now for ₹1
+            Get Pro Now for ₹1/month
           </Button>
         </div>
       </div>
