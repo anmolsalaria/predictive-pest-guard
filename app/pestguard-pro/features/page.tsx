@@ -9,12 +9,15 @@ import { Upload, MessageSquare } from "lucide-react";
 import AuthCheck from "@/components/auth/AuthCheck";
 import ProFeatureGuard from "@/components/ProFeatureGuard";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 function ProFeaturesContent() {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [expertQuestion, setExpertQuestion] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,7 +28,7 @@ function ProFeaturesContent() {
   const handleUpload = async () => {
     if (!selectedFile) return;
     
-    setIsUploading(true);
+    setIsLoading(true);
     try {
       // Mock upload and analysis
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -34,24 +37,47 @@ function ProFeaturesContent() {
       console.error('Error uploading image:', error);
       alert('Failed to upload image. Please try again.');
     } finally {
-      setIsUploading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleExpertSubmit = async () => {
-    if (!expertQuestion.trim()) return;
+  const handleChatSubmit = async () => {
+    if (!chatMessage.trim()) return;
     
-    setIsSending(true);
+    setIsLoading(true);
     try {
-      // Mock expert consultation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert('Your question has been sent to our experts. You will receive a response within 24 hours.');
-      setExpertQuestion('');
+      // Add user message to chat history
+      const userMessage = chatMessage.trim();
+      setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+      setChatMessage('');
+
+      // Call Gemini API
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDc5w7ym-3PktJFe3kFb___LViy14kRnAQ`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: userMessage }]
+          }]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI');
+      }
+
+      const data = await response.json();
+      const aiResponse = data.candidates[0].content.parts[0].text;
+
+      // Add AI response to chat history
+      setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
-      console.error('Error sending question:', error);
-      alert('Failed to send question. Please try again.');
+      console.error('Error in chat:', error);
+      toast.error('Failed to get response. Please try again.');
     } finally {
-      setIsSending(false);
+      setIsLoading(false);
     }
   };
 
@@ -92,43 +118,69 @@ function ProFeaturesContent() {
                 </div>
                 <Button
                   onClick={handleUpload}
-                  disabled={!selectedFile || isUploading}
+                  disabled={!selectedFile || isLoading}
                   className="w-full"
                 >
-                  {isUploading ? 'Analyzing...' : 'Upload Image'}
+                  {isLoading ? 'Analyzing...' : 'Upload Image'}
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Ask an Expert */}
+          {/* AI Chat Assistant */}
           <Card className="bg-white">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-6 w-6 text-primary" />
-                <CardTitle>Ask an Expert</CardTitle>
+                <CardTitle>AI Pest Expert</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Your Question
-                  </label>
-                  <Textarea
-                    placeholder="Describe your pest problem in detail..."
-                    value={expertQuestion}
-                    onChange={(e) => setExpertQuestion(e.target.value)}
-                    className="min-h-[150px]"
-                  />
+                <div className="h-[300px] overflow-y-auto border rounded-lg p-4 bg-gray-50">
+                  {chatHistory.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`mb-4 ${
+                        message.role === 'user' ? 'text-right' : 'text-left'
+                      }`}
+                    >
+                      <div
+                        className={`inline-block p-3 rounded-lg ${
+                          message.role === 'user'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 text-gray-800'
+                        }`}
+                      >
+                        {message.content}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="text-center text-gray-500">
+                      AI is thinking...
+                    </div>
+                  )}
                 </div>
-                <Button
-                  onClick={handleExpertSubmit}
-                  disabled={!expertQuestion.trim() || isSending}
-                  className="w-full"
-                >
-                  {isSending ? 'Sending...' : 'Send to Expert'}
-                </Button>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ask about your pest problem..."
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleChatSubmit();
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={handleChatSubmit}
+                    disabled={!chatMessage.trim() || isLoading}
+                  >
+                    {isLoading ? 'Sending...' : 'Send'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -111,7 +111,7 @@ export function AboutPageContent() {
           </p>
           <div className="flex space-x-4">
             <Button asChild className="flex items-center gap-2">
-              <Link href="https://github.com/Kushagra-Gupta-755/Predictive-PestGuard">
+              <Link href="https://github.com/anmolsalaria/predictive-pest-guard">
                 <FaGithub className="text-xl" /> {t.about.contact.github}
               </Link>
             </Button>

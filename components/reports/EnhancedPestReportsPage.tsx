@@ -511,44 +511,6 @@ export default function EnhancedPestReportsPage() {
           {t.reports.description}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
-                {t.reports.downloadReports.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t.reports.downloadReports.description}
-              </p>
-              <Button onClick={handleExportPDF} className="w-full">
-                <Download className="mr-2 h-4 w-4" />
-                {t.reports.downloadReports.button}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center">
-                <MessageSquare className="h-5 w-5 mr-2" />
-                {t.reports.askExpert.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t.reports.askExpert.description}
-              </p>
-              <Button className="w-full">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                {t.reports.askExpert.button}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>{t.reports.searchAndFilter.title}</CardTitle>
