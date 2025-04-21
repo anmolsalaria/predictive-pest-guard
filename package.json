@@ -60,6 +60,7 @@
     "react-hot-toast": "^2.5.2",
     "react-icons": "latest",
     "react-leaflet": "^4.2.1",
+    "react-markdown": "^10.1.0",
     "react-plotly.js": "latest",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
