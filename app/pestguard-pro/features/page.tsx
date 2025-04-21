@@ -95,33 +95,25 @@ function ProFeaturesContent() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Pest Detection */}
+          {/* Pest Detection by Image */}
           <Card className="bg-white">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Upload className="h-6 w-6 text-primary" />
-                <CardTitle>Pest Detection</CardTitle>
+                <CardTitle>Pest Detection by Image</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Upload an image of the pest
-                  </label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="cursor-pointer"
-                  />
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Upload an image of a pest to get instant detection and analysis using our advanced AI model.
+                </p>
                 <Button
-                  onClick={handleUpload}
-                  disabled={!selectedFile || isLoading}
+                  onClick={() => window.open('https://dummy-flask-app-url.com', '_blank')}
                   className="w-full"
                 >
-                  {isLoading ? 'Analyzing...' : 'Upload Image'}
+                  <Upload className="mr-2 h-4 w-4" />
+                  Go to Pest Detection App
                 </Button>
               </div>
             </CardContent>
